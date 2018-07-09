@@ -28,7 +28,7 @@ namespace ExemploBancoDeDados01
             command.CommandText = "INSERT INTO cores VALUES (@NOME)";
 
             string corDigitada = txtCor.Text;
-            command.Parameters.AddWithValue("@NOME" , corDigitada);
+            command.Parameters.AddWithValue("@NOME", corDigitada);
             command.ExecuteNonQuery();
             MessageBox.Show("Cadastrado");
 
@@ -37,7 +37,7 @@ namespace ExemploBancoDeDados01
 
         private void btnCadastrar_KeyDown(object sender, KeyEventArgs e)
         {
-         
+
         }
 
         private void txtCor_KeyDown(object sender, KeyEventArgs e)
@@ -74,6 +74,80 @@ namespace ExemploBancoDeDados01
             richTextBox1.Clear();
             richTextBox1.AppendText(sb.ToString());
             conexao.Close();
+        }
+
+        private void btnApagar_Click(object sender, EventArgs e)
+        {
+            SqlConnection connection = new SqlConnection(caminhoConexao);
+            connection.Open();
+
+            SqlCommand command = new SqlCommand();
+            command.Connection = connection;
+            command.CommandText = "DELETE FROM cores WHERE nome = @NOMEDACOR";
+            string corParaApagar = cbCorApagar.SelectedItem.ToString();
+            command.Parameters.AddWithValue("@NOMEDACOR", corParaApagar);
+            command.ExecuteNonQuery();
+            cbCorApagar.SelectedIndex = -1;
+            connection.Close();
+        }
+
+        private void cbCorApagar_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbCorApagar.SelectedIndex != -1)
+            {
+                txtNovaCor.Text = cbCorApagar.SelectedItem.ToString();
+            }
+
+        }
+
+        private void cbCorApagar_DropDown(object sender, EventArgs e)
+        {
+            SqlConnection conexao = new SqlConnection(caminhoConexao);
+            conexao.Open();
+
+            SqlCommand command = new SqlCommand("SELECT nome FROM cores ORDER BY nome", conexao);
+            DataTable table = new DataTable();
+            table.Load(command.ExecuteReader());
+            cbCorApagar.Items.Clear();
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                cbCorApagar.Items.Add(table.Rows[i][0].ToString());
+            }
+
+
+            conexao.Close();
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            SqlConnection conexao = new SqlConnection(caminhoConexao);
+            conexao.Open();
+            SqlCommand comando = new SqlCommand();
+            comando.Connection = conexao;
+            comando.CommandText = "UPDATE cores SET nome = @NOVONOME WHERE nome = @ANTIGONOME";
+
+
+            string novoNome = txtNovaCor.Text;
+            string antigoNome = cbCorApagar.SelectedItem.ToString();
+
+            comando.Parameters.AddWithValue("@NOVONOME", novoNome);
+            comando.Parameters.AddWithValue("@ANTIGONOME", antigoNome);
+            comando.ExecuteNonQuery();
+
+            cbCorApagar.SelectedIndex = -1;
+            txtNovaCor.Clear();
+            conexao.Close();
+
         }
     }
 }
